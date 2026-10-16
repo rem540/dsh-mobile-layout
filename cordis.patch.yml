@@ -1,0 +1,6 @@
+# dsh-mobile-layout profile patch layer
+# 往加载器里插一条条目；浏览器那一半由 dsh-client-modules 通过包的
+# dsh.client 声明自动挂到 /plugins/dsh-mobile-layout/client.js。
+- insert:
+    - id: mobile-layout
+      name: 'dsh-mobile-layout'
