@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--
+  自测用的小页面：把 src/dsh-mobile-fix.css 里每条选择器都摆一个（或故意不摆）对应元素，
+  好让 tools/check_selectors.py 在**不连 DSH** 的情况下也能验一遍逻辑：
+
+      python tools/check_selectors.py --file tools/sample-dsh.html
+
+  这里的关键是类名用「假哈希_语义后缀」的样子（`zz9xQ_navCell`），因为真 DSH 的类名就是
+  `哈希_后缀`，而这份 CSS 只认后缀。所以这个文件就是那份 CSS 的"活的定义"：
+  哪天 CSS 里加了一条 `[class*='_newThing']`，这里没有对应元素，检查就报零匹配 ——
+  这正是想要的行为（否则加了新规则没人知道它有没有生效）。
+
+  故意留了一条零匹配：`[class*='_switch']`。元素我摆的是 `_toggleSwitch` 这种
+  后缀不对的名字，用来验证「零匹配 → 退出码 1 → 打印出来」这条路走得通。
+  别为了让检查全绿而改它：真要全绿，就跑真页面的那条命令。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>check_selectors.py 自测页</title>
+<style>
+  body { margin: 0; font: 14px/1.5 system-ui, sans-serif; }
+  .zz9xQ_panel { display: flex; width: 342px; height: 600px; background: #fff; }
+  .zz9xQ_nav { width: 188px; background: #f5f5f5; display: flex; flex-direction: column; }
+  .zz9xQ_content { flex: 1; padding: 8px; }
+  .zz9xQ_options { padding: 4px; }
+  .PgWN5G_row { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; }
+  .PgWN5G_rowText { flex: 1; }
+  .PgWN5G_title { font-weight: 600; }
+  .PgWN5G_desc { color: #666; font-size: 12px; }
+  .Hefa_q_arrows { display: flex; flex-direction: column; width: 17px; }
+  .BynINW_frame { display: grid; grid-template-columns: 56px 334px 0; }
+  .BynINW_rightbarCol { overflow: visible; width: 0; }
+  .zz9xQ_toggleSwitch { width: 36px; height: 20px; background: #ccc; }
+  .zz9xQ_cubeRow { display: flex; gap: 6px; }
+  .zz9xQ_cube { width: 88px; height: 56px; background: #eee; }
+</style>
+</head>
+<body>
+
+<!-- 主界面：右栏（第 159 行那条规则的对象） -->
+<div class="BynINW_frame">
+  <div class="BynINW_sidebarCol">侧</div>
+  <div class="BynINW_centerCol">中</div>
+  <div class="BynINW_rightbarCol">右栏被压成 0 宽，但里面还在布局</div>
+</div>
+
+<!-- 设置按钮：check_selectors.py 靠 aria-label="设置" 找它 -->
+<button aria-label="设置" onclick="openSettings()">设置</button>
+
+<template id="settings-tpl">
+  <!-- [role=dialog] **自己就是** _panel（任务书里特意写过的那个坑） -->
+  <div role="dialog" class="zz9xQ_panel">
+    <nav class="zz9xQ_nav">
+      <div class="zz9xQ_navTitle">设置</div>
+      <div class="zz9xQ_navList">
+        <div class="zz9xQ_navCell"><span class="zz9xQ_navLabel">通用</span></div>
+        <div class="zz9xQ_navCell"><span class="zz9xQ_navLabel">外观</span></div>
+      </div>
+    </nav>
+    <div class="zz9xQ_content">
+      <div class="zz9xQ_options">
+        <!-- 裸 div 当第一个孩子：CSS 第 98 行特意不只认 _rowText -->
+        <div class="PgWN5G_row">
+          <div>语言</div>
+          <div class="PgWN5G_rowText">
+            <div class="PgWN5G_title">界面语言</div>
+            <div class="PgWN5G_description">切换后需要重新加载</div>
+          </div>
+        </div>
+        <div class="PgWN5G_setting">
+          <div class="PgWN5G_settingText"><span class="PgWN5G_desc">字号</span></div>
+          <div class="Hefa_q_arrows"><span>▲</span><span>▼</span></div>
+          <!-- ★ 故意的零匹配：后缀是 _toggleSwitch，不是 _switch -->
+          <div class="zz9xQ_toggleSwitch" role="switch" aria-checked="true"></div>
+        </div>
+        <div class="zz9xQ_cubeRow">
+          <div class="zz9xQ_cube">浅色</div>
+          <div class="zz9xQ_cube">深色</div>
+          <div class="zz9xQ_cube">跟随系统</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<div id="host"></div>
+
+<script>
+function openSettings() {
+  if (document.querySelector('[role=dialog]')) return;
+  document.getElementById('host').appendChild(
+    document.getElementById('settings-tpl').content.cloneNode(true));
+}
+// 真页面是点了才出现设置面板；这里给个 URL 参数好做「面板已开」的那种测试
+if (location.search.indexOf('settings=1') >= 0) openSettings();
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<!--
+  「页面根本没打开对」的模拟页：一个正常的 DSH 元素都没有，只有一个盖住整页的
+  「预览版说明」弹窗（登录前/全新 profile 时就是这个样子）。用来验
+  tools/check_selectors.py 的两条行为：
+
+      python tools/check_selectors.py --file tools/sample-notloaded.html
+      → 全部零匹配 → 必须多打那句「这不像'改版'，更像页面根本没打开对」
+
+  另外它顺便验了弹窗处理那两步（照 dsh_mobile_audit.py）：先点「继续」，
+  点不掉就从 DOM 里把含「预览版说明」的 [role=dialog] 摘掉 —— 摘掉之后
+  按钮数会变成 0，正好是"没登录"的判据。
+-->
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>没打开对的样子</title></head>
+<body>
+<div role="dialog" aria-modal="true">
+  <h2>预览版说明</h2>
+  <p>这是一段预览阶段的说明，会挡住整页。</p>
+  <button aria-label="继续" onclick="this.closest('[role=dialog]').remove()">继续</button>
+</div>
+</body>
+</html>

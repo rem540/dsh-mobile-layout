@@ -1,3 +1,29 @@
+## ⚠️ 改这个插件，只改这一个仓库
+
+手机端布局修复插件的**唯一真源**是本仓库的 `src/dsh-mobile-fix.css`。
+改完跑 `tools/build.py --profile web`（装到哪个目录它会完整打印出来），重启 `dsh web` 生效。
+
+外面还有几份 CSS 副本，**都别改**：
+
+| # | 路径 | 谁在读 | 该干嘛 |
+|---|------|--------|--------|
+| 1 | 本仓库 `src/dsh-mobile-fix.css` | `tools/build.py` | ★ 真源，改这里 |
+| 2 | `C:\Users\X\.dsh\profiles\web\node_modules\dsh-mobile-layout\` | DSH 的 `web` profile（真在跑） | `--profile web` 装出来的产物 |
+| 3 | `dsh-toolkit\plugin\` | 没人读 | 整包复制品（旧的第二仓库），由另一份任务书清掉 |
+| 4 | `dsh-toolkit\docs\dsh-mobile-fix.css` | 没人读 | 复制品，同上 |
+| 5 | `G:\文档\deepseek-harness\default-workspace\dsh-mobile-fix.css` | 旧的 `build_mobile_plugin.py` | 历史遗留，别再改它 |
+
+两条构建链只有一条算数：本仓库 `tools/build.py`（`src/` → `lib/`，`--profile web` 装进 DSH）。
+`dsh-toolkit` 里那个读 G 盘文件的 `build_mobile_plugin.py` 是旧链，已废弃，别再走它。
+
+> 改 `dsh-toolkit` 里的任何一份 CSS，手机上都不会变。
+> 真正生效的只有本仓库 `src/dsh-mobile-fix.css` → `tools/build.py --profile web` 这条路。
+
+改完忘了重装？跑 `tools/build.py --check`：把已安装的 `lib/client.js` 里嵌的 CSS 和真源比对，
+一致退出码 0，不一致打印两边长度和哈希并退出码 1。
+
+---
+
 # dsh-mobile-layout
 
 DSH（DeepSeek Harness）Web 端的**窄屏布局修复插件**。手机上打开 DSH 时，设置面板和主界面在 700px 以下会挤成一团；这个插件只做一件事：在窄屏下把它们的排版改对。
